@@ -8,7 +8,7 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer';
 
-const fontURL = new URL('../assets/droid_serif_regular.typeface.json', import.meta.url);
+const fontURL = new URL('../assets/optimer_regular.typeface.json', import.meta.url);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -67,23 +67,24 @@ plane.rotation.x = 0.5 * Math.PI;
 // scene.add( line );
 
 
-// const fontLoader = new FontLoader();
-// fontLoader.load(
-//   fontURL.href,
-//   (droidFont) => {
-//     const textGeometry = new TextGeometry('three.js', {
-//       size: 50,
-//       height: 100,
-//       font: droidFont,
-//     });
-//     const textMaterial = new THREE.MeshNormalMaterial({ color: 0xff00ff });
-//     const text = new THREE.Mesh(textGeometry, textMaterial);
-//     text.position.set(0, 10, 0);
-//     scene.add(text);
-//   },
-//   undefined,
-//   undefined
-// );
+const fontLoader = new FontLoader();
+fontLoader.load(
+  fontURL.href,
+  (droidFont) => {
+    console.log("100% carregado");
+
+    let textGeometry = new TextGeometry('three.js', {
+      size: 50,
+      height: 100,
+      font: droidFont,
+    });
+    
+    let textMaterial = new THREE.MeshNormalMaterial({ color: 0xff00ff });
+    let text = new THREE.Mesh(textGeometry, textMaterial);
+    text.position.set(0, 10, 0);
+    scene.add(text);
+  }
+);
 
 
 const gridHelper = new THREE.GridHelper(30);
