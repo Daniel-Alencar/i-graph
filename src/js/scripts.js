@@ -8,6 +8,8 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer';
 
+import Calculator from './latex';
+
 import * as dat from 'dat.gui';
 
 const gui = new dat.GUI();
@@ -16,7 +18,6 @@ const options = {
   cameraPositionY: 40, 
   cameraPositionZ: 30, 
 };
-
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -66,11 +67,30 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 ambientLight.position.set(0, 0, 0);
 
+// Equations
+const F1 = "y=\\left(x-10\\right)^2";
+const calculator = new Calculator(F1);
+
+let points = [];
+for(let x = 0; x < 15; x = x + 0.01) {
+  let y = calculator.eval(x);
+
+  points.push(new THREE.Vector3(x, y, 0));
+}
+
+const material = new THREE.LineBasicMaterial({
+	color: 0xf3f6f4,
+  linewidth: 10
+});
+const geometry = new THREE.BufferGeometry().setFromPoints(points);
+const line = new THREE.Line(geometry, material);
+scene.add(line);
+
 // const directionLightHelper = new THREE.DirectionalLightHelper(ambientLight, 5);
 // scene.add(directionLightHelper);
 
 
-// const planeGeometry = new THREE.PlaneGeometry(30, 30);
+// const planeGeometry = new THREE.PlaneGeometry(30, 30); 
 // const planeMaterial = new THREE.MeshBasicMaterial({ 
 //   color: 0xffffff, 
 //   side: THREE.DoubleSide,
