@@ -8,8 +8,6 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer';
 
-const fontURL = new URL('../assets/optimer_regular.typeface.json', import.meta.url);
-
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -26,9 +24,9 @@ const camera = new THREE.PerspectiveCamera(
 );
 const orbit = new OrbitControls(camera, renderer.domElement);
 
-
+const axesLeghth = 15;
 // define the axis X, Y and Z
-const axesHelper = new THREE.AxesHelper(15);
+const axesHelper = new THREE.AxesHelper(axesLeghth);
 scene.add(axesHelper);
 axesHelper.computeLineDistances()
 camera.position.set(-10,30,30);
@@ -43,14 +41,14 @@ directionalLigth.position.set(50, 50, 50);
 // scene.add(directionLightHelper);
 
 
-const planeGeometry = new THREE.PlaneGeometry(30, 30);
-const planeMaterial = new THREE.MeshBasicMaterial({ 
-  color: 0xffffff, 
-  side: THREE.DoubleSide,
-});
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-scene.add(plane);
-plane.rotation.x = 0.5 * Math.PI;
+// const planeGeometry = new THREE.PlaneGeometry(30, 30);
+// const planeMaterial = new THREE.MeshBasicMaterial({ 
+//   color: 0xffffff, 
+//   side: THREE.DoubleSide,
+// });
+// const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+// scene.add(plane);
+// plane.rotation.x = 0.5 * Math.PI;
 
 
 // const material = new THREE.LineBasicMaterial({
@@ -66,29 +64,42 @@ plane.rotation.x = 0.5 * Math.PI;
 // const line = new THREE.Line( geometry, material );
 // scene.add( line );
 
-
+let font;
+const fontURL = "./droid_serif_regular.json";
 const fontLoader = new FontLoader();
 fontLoader.load(
-  fontURL.href,
-  (droidFont) => {
-    console.log("100% carregado");
+  fontURL,
+  function(droidFont) {
+    font = droidFont;
 
-    let textGeometry = new TextGeometry('three.js', {
-      size: 50,
-      height: 100,
-      font: droidFont,
-    });
-    
-    let textMaterial = new THREE.MeshNormalMaterial({ color: 0xff00ff });
-    let text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.set(0, 10, 0);
-    scene.add(text);
+    for(let value = 0; value <axesLeghth; value++) {
+      let textGeometry = new TextGeometry(value.toString(), {
+        size: 0.5,
+        height: 0,
+        font: droidFont,
+      });
+
+      let textMaterial0 = new THREE.MeshNormalMaterial({ color: 0xff0000 });
+      let text0 = new THREE.Mesh(textGeometry, textMaterial0);
+      text0.position.set(value, 0, 0);
+      scene.add(text0);
+
+      let textMaterial1 = new THREE.MeshNormalMaterial({ color: 0x00ff00 });
+      let text1 = new THREE.Mesh(textGeometry, textMaterial1);
+      text1.position.set(0, value, 0);
+      scene.add(text1);
+
+      let textMaterial2 = new THREE.MeshNormalMaterial({ color: 0x0000ff });
+      let text2 = new THREE.Mesh(textGeometry, textMaterial2);
+      text2.position.set(0, 0, value);
+      scene.add(text2);
+    }
   }
 );
 
 
-const gridHelper = new THREE.GridHelper(30);
-scene.add(gridHelper);
+// const gridHelper = new THREE.GridHelper(30);
+// scene.add(gridHelper);
 
 
 function animate() {
