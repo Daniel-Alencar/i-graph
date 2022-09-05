@@ -8,6 +8,16 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer';
 
+import * as dat from 'dat.gui';
+
+const gui = new dat.GUI();
+const options = {
+  cameraPositionX: -10, 
+  cameraPositionY: 40, 
+  cameraPositionZ: 30, 
+};
+
+
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -21,23 +31,42 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   // maximum visualization
   1000
-);
-const orbit = new OrbitControls(camera, renderer.domElement);
+  );
+  camera.lookAt(new THREE.Vector3(0, 15, 0));
+  camera.position.set(
+    options.cameraPositionX,
+    options.cameraPositionY,
+    options.cameraPositionZ
+  );
+  
+  const cameraHelper = new THREE.CameraHelper(camera);
+  scene.add(cameraHelper);
+
+  gui.add(options, 'cameraPositionX').onChange((property) => {
+    camera.position.x = property;
+  });
+  gui.add(options, 'cameraPositionY').onChange((property) => {
+    camera.position.y = property;
+  });
+  gui.add(options, 'cameraPositionZ').onChange((property) => {
+    camera.position.z = property;
+  });
+  
+  const orbit = new OrbitControls(camera, renderer.domElement);
 
 const axesLeghth = 15;
-// define the axis X, Y and Z
+// Define the axis X, Y and Z
 const axesHelper = new THREE.AxesHelper(axesLeghth);
 scene.add(axesHelper);
-axesHelper.computeLineDistances()
-camera.position.set(-10,30,30);
+
 orbit.update();
 
 
-const directionalLigth = new THREE.DirectionalLight(0xffffff, 0.8);
-scene.add(directionalLigth);
-directionalLigth.position.set(50, 50, 50);
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+scene.add(ambientLight);
+ambientLight.position.set(0, 0, 0);
 
-// const directionLightHelper = new THREE.DirectionalLightHelper(directionalLigth, 5);
+// const directionLightHelper = new THREE.DirectionalLightHelper(ambientLight, 5);
 // scene.add(directionLightHelper);
 
 
@@ -72,24 +101,24 @@ fontLoader.load(
   function(droidFont) {
     font = droidFont;
 
-    for(let value = 0; value <axesLeghth; value++) {
+    for(let value = 0; value <= axesLeghth; value++) {
       let textGeometry = new TextGeometry(value.toString(), {
         size: 0.5,
         height: 0,
         font: droidFont,
       });
 
-      let textMaterial0 = new THREE.MeshNormalMaterial({ color: 0xff0000 });
+      let textMaterial0 = new THREE.MeshBasicMaterial({ color: 0xff0000 });
       let text0 = new THREE.Mesh(textGeometry, textMaterial0);
       text0.position.set(value, 0, 0);
       scene.add(text0);
 
-      let textMaterial1 = new THREE.MeshNormalMaterial({ color: 0x00ff00 });
+      let textMaterial1 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
       let text1 = new THREE.Mesh(textGeometry, textMaterial1);
       text1.position.set(0, value, 0);
       scene.add(text1);
 
-      let textMaterial2 = new THREE.MeshNormalMaterial({ color: 0x0000ff });
+      let textMaterial2 = new THREE.MeshBasicMaterial({ color: 0x0000ff });
       let text2 = new THREE.Mesh(textGeometry, textMaterial2);
       text2.position.set(0, 0, value);
       scene.add(text2);
