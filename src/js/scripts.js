@@ -33,34 +33,70 @@ const camera = new THREE.PerspectiveCamera(
   // maximum visualization
   1000
   );
-  camera.lookAt(new THREE.Vector3(0, 15, 0));
-  camera.position.set(
-    options.cameraPositionX,
-    options.cameraPositionY,
-    options.cameraPositionZ
-  );
-  
-  const cameraHelper = new THREE.CameraHelper(camera);
-  scene.add(cameraHelper);
+camera.lookAt(new THREE.Vector3(0, 15, 0));
+camera.position.set(
+  options.cameraPositionX,
+  options.cameraPositionY,
+  options.cameraPositionZ
+);
 
-  gui.add(options, 'cameraPositionX').onChange((property) => {
-    camera.position.x = property;
-  });
-  gui.add(options, 'cameraPositionY').onChange((property) => {
-    camera.position.y = property;
-  });
-  gui.add(options, 'cameraPositionZ').onChange((property) => {
-    camera.position.z = property;
-  });
-  
-  const orbit = new OrbitControls(camera, renderer.domElement);
+// const cameraHelper = new THREE.CameraHelper(camera);
+// scene.add(cameraHelper);
+
+// gui.add(options, 'cameraPositionX').onChange((property) => {
+//   camera.position.x = property;
+// });
+// gui.add(options, 'cameraPositionY').onChange((property) => {
+//   camera.position.y = property;
+// });
+// gui.add(options, 'cameraPositionZ').onChange((property) => {
+//   camera.position.z = property;
+// });
+
+const orbit = new OrbitControls(camera, renderer.domElement);
+
+
+
+
+
 
 const axesLeghth = 15;
 // Define the axis X, Y and Z
 const axesHelper = new THREE.AxesHelper(axesLeghth);
 scene.add(axesHelper);
 
+const materialsForAxes = [
+  new THREE.LineBasicMaterial({
+    color: 0xff0000,
+    linewidth: 1
+  }),
+  new THREE.LineBasicMaterial({
+    color: 0x00ff00,
+    linewidth: 1
+  }),
+  new THREE.LineBasicMaterial({
+    color: 0x0000ff,
+    linewidth: 1
+  })
+]
+const pointsForAxes = [
+  new THREE.Vector3(-axesLeghth, 0, 0),
+  new THREE.Vector3(0, -axesLeghth, 0),
+  new THREE.Vector3(0, 0, -axesLeghth)
+];
+
+for(let i = 0; i < pointsForAxes.length; i++) {
+  const negativeAxeGeometry = new THREE.BufferGeometry();
+  negativeAxeGeometry.setFromPoints([new THREE.Vector3(0,0,0), pointsForAxes[i]]);
+  
+  const negativeAxe = new THREE.Line(negativeAxeGeometry, materialsForAxes[i]);
+  scene.add(negativeAxe);
+}
 orbit.update();
+
+
+
+
 
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -68,23 +104,31 @@ scene.add(ambientLight);
 ambientLight.position.set(0, 0, 0);
 
 // Equations
-const F1 = "y=\\left(x-10\\right)^2";
+const F1 = "y=x^2";
 const calculator = new Calculator(F1);
 
-let points = [];
-for(let x = 0; x < 15; x = x + 0.01) {
-  let y = calculator.eval(x);
-
-  points.push(new THREE.Vector3(x, y, 0));
-}
+let points0 = [];
+let points1 = [];
 
 const material = new THREE.LineBasicMaterial({
-	color: 0xf3f6f4,
-  linewidth: 10
+  color: 0xf3f6f4,
+  linewidth: 1
 });
-const geometry = new THREE.BufferGeometry().setFromPoints(points);
-const line = new THREE.Line(geometry, material);
-scene.add(line);
+
+for(let x = -15, i = 0; x < axesLeghth; x = x + 0.01, i++) {
+  let y = calculator.eval(x);
+
+  points0.push(new THREE.Vector3(x, y, - axesLeghth));
+  points1.push(new THREE.Vector3(x, y, + axesLeghth));
+}
+
+for(let i = 0; i < points0.length; i++) {
+  if(points0[i].y > + axesLeghth || points0[i].y < - axesLeghth) continue;
+
+  const geometryZLine = new THREE.BufferGeometry().setFromPoints([points0[i], points1[i]]);
+  const ZLine = new THREE.Line(geometryZLine, material);
+  scene.add(ZLine);
+}
 
 // const directionLightHelper = new THREE.DirectionalLightHelper(ambientLight, 5);
 // scene.add(directionLightHelper);
@@ -121,9 +165,9 @@ fontLoader.load(
   function(droidFont) {
     font = droidFont;
 
-    for(let value = 0; value <= axesLeghth; value++) {
+    for(let value = -axesLeghth; value <= axesLeghth; value++) {
       let textGeometry = new TextGeometry(value.toString(), {
-        size: 0.5,
+        size: 0.3,
         height: 0,
         font: droidFont,
       });

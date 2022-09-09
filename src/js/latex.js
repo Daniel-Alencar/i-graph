@@ -1,5 +1,6 @@
+
+// Define your constants
 var CALC_CONST = {
-  // define your constants
   e: Math.E,
   pi: Math.PI
 };
@@ -14,7 +15,7 @@ var Calc = function(expr, infix) {
   this.expr = expr;
 
   if (!infix) {
-    // by default treat expr as raw latex
+    // By default treat expr as raw latex
     this.expr = this.latexToInfix(expr);
   }
 
@@ -22,11 +23,9 @@ var Calc = function(expr, infix) {
     if (typeof op == "undefined") return 0;
 
     return op.match(/^(floor|ceil|(sin|cos|tan|sec|csc|cot)h?)$/) ? 10
-
          : (op === "^") ? 9
          : (op === "*" || op === "/") ? 8
          : (op === "+" || op === "-") ? 7
-
          : 0;
   }
 
@@ -79,7 +78,7 @@ var Calc = function(expr, infix) {
           }
         }
 
-        // remove the (
+        // Remove the (
         op_stack.pop();
       }
       else if (token === "(") {
@@ -116,7 +115,7 @@ var Calc = function(expr, infix) {
 }
 
 /**
- * returns the result of evaluating the current expression
+ * Returns the result of evaluating the current expression
  */
 Calc.prototype.eval = function(x) {
   var stack = [], rpn_expr = this.rpn_expr;
@@ -125,13 +124,13 @@ Calc.prototype.eval = function(x) {
     if (typeof token[0] == "string") {
       switch (token[0]) {
         case "var":
-          // Variable, i.e. x as in f(x); push value onto stack
-          //if (token[1] != "x") return false;
+          // Variable, i.e. x as in f(x) (push value onto stack)
+          // if (token[1] != "x") return false;
           stack.push(x);
           break;
 
         case "num":
-          // Number; push value onto stack
+          // Number (push value onto stack)
           stack.push(token[1]);
           break;
       }
@@ -159,7 +158,7 @@ Calc.prototype.eval = function(x) {
           stack.push(args[0] - args[1]);
           break;
 
-        // exponents
+        /* EXPONENTS */
         case "^":
           stack.push(Math.pow(args[0], args[1]));
           break;
@@ -202,7 +201,6 @@ Calc.prototype.eval = function(x) {
           stack.push((Math.pow(Math.E, 2*args[0]) + 1) / (Math.pow(Math.E, 2*args[0]) - 1));
           break;
 
-
         case "floor":
           stack.push(Math.floor(args[0]));
           break;
@@ -211,7 +209,6 @@ Calc.prototype.eval = function(x) {
           break;
 
         default:
-          // unknown operator; error out
           return false;
       }
     }
@@ -221,26 +218,29 @@ Calc.prototype.eval = function(x) {
 };
 
 Calc.prototype.latexToInfix = function(latex) {
-  /**
-    * function: converts latex notation to infix notation (human-readable, to be converted
-    * again to prefix in order to be processed
-    *
-    * Supported functions / operators / notation:
-    * parentheses, exponents, adding, subtracting, multipling, dividing, fractions
-    * trigonometric (including hyperbolic) functions, floor, ceil
-    */
+  /*
+   * Function: converts latex notation to infix notation (human-readable, to be converted
+   * again to prefix in order to be processed
+   *
+   * Supported functions / operators / notation:
+   * parentheses, exponents, adding, subtracting, multipling, dividing, fractions
+   * trigonometric (including hyperbolic) functions, floor, ceil
+   */
 
   var infix = latex;
 
   infix = infix
-    .replace(/\\frac{([^}]+)}{([^}]+)}/g, "($1)/($2)") // fractions
-    .replace(/\\left\(/g, "(") // open parenthesis
-    .replace(/\\right\)/g, ")") // close parenthesis
-    .replace(/[^\(](floor|ceil|(sin|cos|tan|sec|csc|cot)h?)\(([^\(\)]+)\)[^\)]/g, "($&)") // functions
+    // Fractions
+    .replace(/\\frac{([^}]+)}{([^}]+)}/g, "($1)/($2)")
+    // Open parenthesis
+    .replace(/\\left\(/g, "(")
+    // Close parenthesis
+    .replace(/\\right\)/g, ")")
+    // Functions
+    .replace(/[^\(](floor|ceil|(sin|cos|tan|sec|csc|cot)h?)\(([^\(\)]+)\)[^\)]/g, "($&)")
     .replace(/([^(floor|ceil|(sin|cos|tan|sec|csc|cot)h?|\+|\-|\*|\/)])\(/g, "$1*(")
     .replace(/\)([\w])/g, ")*$1")
-    .replace(/([0-9])([A-Za-z])/g, "$1*$2")
-  ;
+    .replace(/([0-9])([A-Za-z])/g, "$1*$2");
 
   return infix;
 };
