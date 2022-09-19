@@ -11,12 +11,14 @@ import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer';
 import Calculator from './latex';
 
 import * as dat from 'dat.gui';
+import { operation_R1_I, operation_R2_R } from './functions';
 
 const gui = new dat.GUI();
 const options = {
   cameraPositionX: -10, 
   cameraPositionY: 40, 
-  cameraPositionZ: 30, 
+  cameraPositionZ: 30,
+  Y: 0 
 };
 
 const renderer = new THREE.WebGLRenderer();
@@ -60,9 +62,9 @@ const orbit = new OrbitControls(camera, renderer.domElement);
 
 
 
-const axesLeghth = 15;
+const axesLength = 15;
 // Define the axis X, Y and Z
-const axesHelper = new THREE.AxesHelper(axesLeghth);
+const axesHelper = new THREE.AxesHelper(axesLength);
 scene.add(axesHelper);
 
 const materialsForAxes = [
@@ -80,9 +82,9 @@ const materialsForAxes = [
   })
 ]
 const pointsForAxes = [
-  new THREE.Vector3(-axesLeghth, 0, 0),
-  new THREE.Vector3(0, -axesLeghth, 0),
-  new THREE.Vector3(0, 0, -axesLeghth)
+  new THREE.Vector3(-axesLength, 0, 0),
+  new THREE.Vector3(0, -axesLength, 0),
+  new THREE.Vector3(0, 0, -axesLength)
 ];
 
 for(let i = 0; i < pointsForAxes.length; i++) {
@@ -103,36 +105,99 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 ambientLight.position.set(0, 0, 0);
 
+
+
+
+
+
+
+
+
+
+
+
 // Equations
-const F1 = "y=x^2";
-const calculator = new Calculator(F1);
-
-let points0 = [];
-let points1 = [];
-
-const material = new THREE.LineBasicMaterial({
+const graphMaterial = new THREE.LineBasicMaterial({
   color: 0xf3f6f4,
   linewidth: 1
 });
 
-for(let x = -15, i = 0; x < axesLeghth; x = x + 0.01, i++) {
-  let y = calculator.eval(x);
 
-  points0.push(new THREE.Vector3(x, y, - axesLeghth));
-  points1.push(new THREE.Vector3(x, y, + axesLeghth));
+// let points0 = [];
+
+// f: R -> R
+// f: R -> I
+
+// for(let x = -axesLength; x < axesLength; x = x + 0.01) {
+//   let result = operation_R1_I(x);
+
+//   if(typeof(result) == "object") {
+//     points0.push(new THREE.Vector3(x, result.re, result.im));
+//   } else {
+//     points0.push(new THREE.Vector3(x, result, 0));
+//   }
+// }
+
+// const graphGeometry = new THREE.BufferGeometry().setFromPoints(points0);
+// const graph = new THREE.Line(graphGeometry, graphMaterial);
+// scene.add(graph);
+
+
+
+// f: R2 -> R
+
+// for(let x = -axesLength; x < axesLength; x = x + 0.01) {
+//   for(let y = -axesLength; y < axesLength; y = y + 0.01) {
+
+//     let result = operation_R2_R(x, y);
+//     if(typeof(result) == "number") {
+//       points0.push(new THREE.Vector3(x, y, result));
+//     }
+//   }
+// }
+
+// const graphGeometry = new THREE.BufferGeometry().setFromPoints(points0);
+// const graph = new THREE.Line(graphGeometry, graphMaterial);
+// scene.add(graph);
+
+
+
+// f: R2 -> I
+
+
+let points = [];
+for(let x = -axesLength; x < axesLength; x = x + 0.1) {
+  for(let y = -axesLength, i = 0; y < axesLength; y = y + 0.1, i++) {
+
+    let result = operation_R2_R(x, y);
+    // Primeira iteração do FOR da variável X 
+    if(x === -axesLength) {
+      points.push(y);
+      points[i] = [];
+    }
+
+    if(typeof(result) == "number") {
+      points[i].push(new THREE.Vector3(x, result, 0));
+    } else {
+      points[i].push(new THREE.Vector3(x, result.re, result.im));
+    }
+  }
 }
 
-for(let i = 0; i < points0.length; i++) {
-  if(points0[i].y > + axesLeghth || points0[i].y < - axesLeghth) continue;
+console.log(points);
 
-  const geometryZLine = new THREE.BufferGeometry().setFromPoints([points0[i], points1[i]]);
-  const ZLine = new THREE.Line(geometryZLine, material);
-  scene.add(ZLine);
-}
+gui.add(options, 'Y', - axesLength, + axesLength, 0.1);
+
+const graphGeometry = new THREE.BufferGeometry().setFromPoints(points[options.Y]);
+const graph = new THREE.Line(graphGeometry, graphMaterial);
+scene.add(graph);
+
+
+
+
 
 // const directionLightHelper = new THREE.DirectionalLightHelper(ambientLight, 5);
 // scene.add(directionLightHelper);
-
 
 // const planeGeometry = new THREE.PlaneGeometry(30, 30); 
 // const planeMaterial = new THREE.MeshBasicMaterial({ 
@@ -165,7 +230,7 @@ fontLoader.load(
   function(droidFont) {
     font = droidFont;
 
-    for(let value = -axesLeghth; value <= axesLeghth; value++) {
+    for(let value = -axesLength; value <= axesLength; value++) {
       let textGeometry = new TextGeometry(value.toString(), {
         size: 0.3,
         height: 0,
