@@ -13,12 +13,14 @@ import Calculator from './latex';
 import * as dat from 'dat.gui';
 import { operation_R1_I, operation_R2_R } from './functions';
 
+const step = 0.01;
+
 const gui = new dat.GUI();
 const options = {
   cameraPositionX: -10, 
   cameraPositionY: 40, 
   cameraPositionZ: 30,
-  Y: 0 
+  index_variation: 0 
 };
 
 const renderer = new THREE.WebGLRenderer();
@@ -128,7 +130,7 @@ const graphMaterial = new THREE.LineBasicMaterial({
 // f: R -> R
 // f: R -> I
 
-// for(let x = -axesLength; x < axesLength; x = x + 0.01) {
+// for(let x = -axesLength; x <= axesLength; x = x + step) {
 //   let result = operation_R1_I(x);
 
 //   if(typeof(result) == "object") {
@@ -146,8 +148,8 @@ const graphMaterial = new THREE.LineBasicMaterial({
 
 // f: R2 -> R
 
-// for(let x = -axesLength; x < axesLength; x = x + 0.01) {
-//   for(let y = -axesLength; y < axesLength; y = y + 0.01) {
+// for(let x = -axesLength; x <= axesLength; x = x + step) {
+//   for(let y = -axesLength; y <= axesLength; y = y + step) {
 
 //     let result = operation_R2_R(x, y);
 //     if(typeof(result) == "number") {
@@ -166,16 +168,16 @@ const graphMaterial = new THREE.LineBasicMaterial({
 
 
 let points = [];
-for(let x = -axesLength; x < axesLength; x = x + 0.1) {
-  for(let y = -axesLength, i = 0; y < axesLength; y = y + 0.1, i++) {
+for(let x = -axesLength; x <= axesLength; x = x + step) {
+  for(let y = -axesLength, i = 0; y <= axesLength; y = y + step, i++) {
 
-    let result = operation_R2_R(x, y);
     // Primeira iteração do FOR da variável X 
     if(x === -axesLength) {
       points.push(y);
       points[i] = [];
     }
-
+    
+    let result = operation_R2_R(x, y);
     if(typeof(result) == "number") {
       points[i].push(new THREE.Vector3(x, result, 0));
     } else {
@@ -184,15 +186,14 @@ for(let x = -axesLength; x < axesLength; x = x + 0.1) {
   }
 }
 
-console.log(points);
+let indexVariationComponent = gui.add(options, 'index_variation', 0, points.length - 1, 1);
+indexVariationComponent.onChange((property) => {
+  graphGeometry.setFromPoints(points[property]);
+});
 
-gui.add(options, 'Y', - axesLength, + axesLength, 0.1);
-
-const graphGeometry = new THREE.BufferGeometry().setFromPoints(points[options.Y]);
+const graphGeometry = new THREE.BufferGeometry().setFromPoints(points[options.index_variation]);
 const graph = new THREE.Line(graphGeometry, graphMaterial);
 scene.add(graph);
-
-
 
 
 
