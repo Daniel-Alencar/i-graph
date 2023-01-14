@@ -6,14 +6,10 @@ import { TTFLoader } from 'three/examples/jsm/loaders/TTFLoader.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
-import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer';
-
-import Calculator from './latex';
-
 import * as dat from 'dat.gui';
-import { operation_R1_I, operation_R2_R } from './functions';
+import { operation_R1, operation_R2 } from './functions';
 
-// constants
+// Constants
 const step = 0.01;
 const axesLength = 15;
 
@@ -50,10 +46,7 @@ camera.position.set(
 
 const orbit = new OrbitControls(camera, renderer.domElement);
 
-// Define os eixos X, Y e Z
-// const axesHelper = new THREE.AxesHelper(axesLength);
-// scene.add(axesHelper);
-
+// AXES
 const materialsForAxes = [
   new THREE.LineBasicMaterial({
     color: 0xff0000,
@@ -88,21 +81,11 @@ for(let i = 0; i < pointsForAxes.length; i++) {
 }
 orbit.update();
 
-// Define o plano de orientação dos eixos
-// const planeGeometry = new THREE.PlaneGeometry(30, 30); 
-// const planeMaterial = new THREE.MeshBasicMaterial({ 
-//   color: 0xff00ff, 
-//   side: THREE.DoubleSide,
-// });
-// const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-// scene.add(plane);
-// plane.rotation.x = 0.5 * Math.PI;
-
-// Faz o GRID no plano
+// GRID no plano
 const gridHelper = new THREE.GridHelper(30);
 scene.add(gridHelper);
 
-// Define a criação do texto
+// Criação do texto
 let text0, text1, text2;
 const textMaterial0 = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 const textMaterial1 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -143,7 +126,7 @@ function createText(font) {
   }
 }
 
-// Define a fonte
+// Definição da Fonte
 let font;
 const fontURL = "./droid_serif_regular.json";
 const fontLoader = new FontLoader();
@@ -166,12 +149,6 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 ambientLight.position.set(0, 0, 0);
 
-// Define uma luz direcional na cena 
-// const directionLightHelper = new THREE.DirectionalLightHelper(ambientLight, 5);
-// scene.add(directionLightHelper);
-
-
-
 
 
 
@@ -190,23 +167,21 @@ addEventListener('click', () => {
 
 
 
-// Equations
+// Gráficos
 const graphMaterial = new THREE.LineBasicMaterial({
   color: 0xf3f6f4,
   linewidth: 1
 });
 
 let points0 = [];
-// f: R -> R
-// f: R -> I
 
 for(let x = -axesLength; x <= axesLength; x = x + step) {
-  let result = operation_R1_I(x);
+  let result = operation_R1(x);
 
   if(typeof(result) == "object") {
-      points0.push(new THREE.Vector3(x, result.re, result.im));
-    } else {
-        points0.push(new THREE.Vector3(x, result, 0));
+    points0.push(new THREE.Vector3(x, result.re, result.im));
+  } else {
+    points0.push(new THREE.Vector3(x, result, 0));
   }
 }
 
@@ -216,67 +191,14 @@ scene.add(graph);
 
 
 
-// f: R2 -> R
-// for(let x = -axesLength; x <= axesLength; x = x + step) {
-//   for(let y = -axesLength; y <= axesLength; y = y + step) {
-
-//     let result = operation_R2_R(x, y);
-//     if(typeof(result) == "number") {
-//       points0.push(new THREE.Vector3(x, y, result));
-//     }
-//   }
-// }
-
-// const graphGeometry = new THREE.BufferGeometry().setFromPoints(points0);
-// const graph = new THREE.Line(graphGeometry, graphMaterial);
-// scene.add(graph);
 
 
-
-// f: R2 -> I
-// let points = [];
-// for(let x = -axesLength; x <= axesLength; x = x + step) {
-//   for(let y = -axesLength, i = 0; y <= axesLength; y = y + step, i++) {
-
-//     // Primeira iteração do FOR da variável X 
-//     if(x === -axesLength) {
-//       points.push(y);
-//       points[i] = [];
-//     }
-    
-//     let result = operation_R2_R(x, y);
-//     if(typeof(result) == "number") {
-//       points[i].push(new THREE.Vector3(x, result, 0));
-//     } else {
-//       points[i].push(new THREE.Vector3(x, result.re, result.im));
-//     }
-//   }
-// }
-
-// let indexVariationComponent = gui.add(options, 'index_variation', 0, points.length - 1, 1);
-// indexVariationComponent.onChange((property) => {
-//   graphGeometry.setFromPoints(points[property]);
-// });
-
-// const graphGeometry = new THREE.BufferGeometry().setFromPoints(points[options.index_variation]);
-// const graph = new THREE.Line(graphGeometry, graphMaterial);
-// scene.add(graph);
-
-
-
-
-
-
-
-
-
-
+// Animação
 function animate() {
   box.lookAt(camera.position);
   if(font) {
     createText(font);
   }
-
   renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);
