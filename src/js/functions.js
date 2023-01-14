@@ -1,10 +1,5 @@
-
-export function operation_R1(x) {
-  const result = math.pow(-1, x);
-  return result;
-}
-
-export function operation_R2(x, y) {
-  const result = math.pow(-1, x + y);
+// Há um problema com o caso f: R2 -> R
+export function operation(x) {
+  const result = math.pow(-1.2, x);
   return result;
 }

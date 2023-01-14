@@ -7,7 +7,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 import * as dat from 'dat.gui';
-import { operation_R1, operation_R2 } from './functions';
+import { operation } from './functions';
 
 // Constants
 const step = 0.01;
@@ -155,39 +155,80 @@ ambientLight.position.set(0, 0, 0);
 
 
 
-addEventListener('click', () => {
-  console.log(camera.position);
-});
-
-
-
-
-
 
 
 
 
 // Gráficos
+// f: R1 -> (R ou I)
+// f: R2 -> (R ou I)
+
 const graphMaterial = new THREE.LineBasicMaterial({
   color: 0xf3f6f4,
   linewidth: 1
 });
 
-let points0 = [];
+function graphR1() {
+  let points = [];
+  for(let x = -axesLength; x <= axesLength; x = x + step) {
+    let result = operation(x);
+  
+    if(typeof(result) == "object") {
+      points.push(new THREE.Vector3(x, result.re, result.im));
+    } else {
+      points.push(new THREE.Vector3(x, result, 0));
+    }
+  }
+  
+  const graphGeometry = new THREE.BufferGeometry().setFromPoints(points);
+  const graph = new THREE.Line(graphGeometry, graphMaterial);
+  scene.add(graph);
+}
 
-for(let x = -axesLength; x <= axesLength; x = x + step) {
-  let result = operation_R1(x);
+function graphR2() {
+  let points = [];
+  for(let x = -axesLength; x <= axesLength; x = x + step) {
+    for(let y = -axesLength, i = 0; y <= axesLength; y = y + step, i++) {
+  
+      // Primeira iteração do FOR da variável X 
+      if(x === -axesLength) {
+        points.push(y);
+        points[i] = [];
+      }
+      
+      let result = operation(x, y);
+      if(typeof(result) == "number") {
+        points[i].push(new THREE.Vector3(x, result, 0));
+      } else {
+        points[i].push(new THREE.Vector3(x, result.re, result.im));
+      }
+    }
+  }
+  
+  let indexVariationComponent = gui.add(options, 'index_variation', 0, points.length - 1, 1);
+  indexVariationComponent.onChange((property) => {
+    graphGeometry.setFromPoints(points[property]);
+  });
+  
+  const graphGeometry = new THREE.BufferGeometry().setFromPoints(points[options.index_variation]);
+  const graph = new THREE.Line(graphGeometry, graphMaterial);
+  scene.add(graph);
+}
 
-  if(typeof(result) == "object") {
-    points0.push(new THREE.Vector3(x, result.re, result.im));
-  } else {
-    points0.push(new THREE.Vector3(x, result, 0));
+function drawGraph(operation) {
+  const dimensionLength = operation.length;
+  console.log(`Dimensão da função: ${dimensionLength}`)
+  
+  switch(dimensionLength) {
+    case 1:
+      graphR1();
+    case 2:
+      graphR2();
   }
 }
 
-const graphGeometry = new THREE.BufferGeometry().setFromPoints(points0);
-const graph = new THREE.Line(graphGeometry, graphMaterial);
-scene.add(graph);
+// Desenhar o gráfico
+drawGraph(operation);
 
 
 
