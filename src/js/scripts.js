@@ -191,28 +191,28 @@ addEventListener('click', () => {
 
 
 // Equations
-// const graphMaterial = new THREE.LineBasicMaterial({
-//   color: 0xf3f6f4,
-//   linewidth: 1
-// });
+const graphMaterial = new THREE.LineBasicMaterial({
+  color: 0xf3f6f4,
+  linewidth: 1
+});
 
-// let points0 = [];
+let points0 = [];
 // f: R -> R
 // f: R -> I
 
-// for(let x = -axesLength; x <= axesLength; x = x + step) {
-//   let result = operation_R1_I(x);
+for(let x = -axesLength; x <= axesLength; x = x + step) {
+  let result = operation_R1_I(x);
 
-//   if(typeof(result) == "object") {
-  //     points0.push(new THREE.Vector3(x, result.re, result.im));
-  //   } else {
-    //     points0.push(new THREE.Vector3(x, result, 0));
-//   }
-// }
+  if(typeof(result) == "object") {
+      points0.push(new THREE.Vector3(x, result.re, result.im));
+    } else {
+        points0.push(new THREE.Vector3(x, result, 0));
+  }
+}
 
-// const graphGeometry = new THREE.BufferGeometry().setFromPoints(points0);
-// const graph = new THREE.Line(graphGeometry, graphMaterial);
-// scene.add(graph);
+const graphGeometry = new THREE.BufferGeometry().setFromPoints(points0);
+const graph = new THREE.Line(graphGeometry, graphMaterial);
+scene.add(graph);
 
 
 

@@ -1,5 +1,3 @@
-// R: Números reais
-// I: Números complexos
 
 export function operation_R1_I(x) {
   const result = math.pow(-1, x);
